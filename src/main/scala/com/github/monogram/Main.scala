@@ -16,8 +16,7 @@ object Main {
 
     val (originalSeq, tracks) = MIDIParser.parse("midis/chopin_nocturne_9_2.mid")
     println(tracks.size)
-    val notesList: List[Note] = MIDIParser.convertAndMapMusic(tracks(0))
-
+    val notesList: List[MusicalElement] = MIDIParser.convertTrack(tracks(0))
     notesList.foreach(println)
   }
 }
