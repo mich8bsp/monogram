@@ -1,11 +1,14 @@
 package com.github.monogram
 
-import com.github.monogram.Note.{A, A_SH, B, C, C_SH, D, D_SH, E, F, F_SH, G, G_SH, Note}
+import com.github.monogram.Note._
 import org.scalajs.dom.ext.Color
 
-class Board(rows: Int, cols: Int){
+class Board(boardRows: Int, boardCols: Int){
 
-  private val boardConfig = Array.ofDim[Note](rows, cols)
+  private var boardConfig = Array.ofDim[BoardElement](boardRows, boardCols)
+  val boardSize = boardRows * boardCols
+
+  case class BoardElement(color: Color)
 
   def boardElementToColor(element: MusicalElement): Color = element match {
     case x: GameNote => x.note match {
@@ -30,11 +33,34 @@ class Board(rows: Int, cols: Int){
     val endTime = elements.last.startTime + elements.last.duration
     val totalDuration = endTime - startTime
 
-    var squaresCounter = 0
-    for(el <- elements){
+    def counterToRowCol(counter: Int): (Int, Int) = (counter / boardCols, counter - (counter / boardCols)*boardCols)
 
+    def durationToNumOfSquares(duration: Long): Int = ((duration.toDouble / totalDuration) * boardSize).ceil.toInt
+
+    def fillBoard(remainingToFill: List[MusicalElement], currentBoardCounter: Int): Unit = remainingToFill match {
+      case x::xs =>
+        val duration = x.duration
+        val squaresToFill = durationToNumOfSquares(duration)
+        println(s"at counter $currentBoardCounter filling $squaresToFill squares")
+        val color = boardElementToColor(x)
+
+        if(squaresToFill>0){
+          Range(currentBoardCounter, currentBoardCounter + squaresToFill).foreach(i => {
+            val (r, c) = counterToRowCol(i)
+            boardConfig(r)(c) = BoardElement(color)
+          })
+        }
+        fillBoard(xs, currentBoardCounter + squaresToFill)
+      case Nil =>
     }
+
+    fillBoard(elements, 0)
   }
+
+  def clearBoard = boardConfig = Array.ofDim[BoardElement](boardRows, boardCols)
+
+  def getColor(r: Int, c: Int) = boardConfig(r)(c).color
+
 
 }
 
