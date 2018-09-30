@@ -1,16 +1,11 @@
 package com.github.monogram
 
-import com.github.monogram.Accidental.Accidental
-import com.github.monogram.NoteRoot.NoteRoot
+object Note extends Enumeration {
+  type Note = Value
+  val C, C_SH, D, D_SH, E, F, F_SH, G, G_SH, A, A_SH, B = Value
 
-case class Note(root: NoteRoot, accidental: Accidental)
-
-object Accidental extends Enumeration{
-  type Accidental = Value
-  val NATURAL, SHARP, FLAT = Value
-}
-
-object NoteRoot extends Enumeration{
-  type NoteRoot = Value
-  val A, B, C, D, E, F, G  = Value
+  def fromPitch(pitch: Int): Note = {
+    // 21 is the pitch of C0
+    Note.values.toList((pitch - 21) % 12)
+  }
 }

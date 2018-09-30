@@ -9,3 +9,4 @@ enablePlugins(ScalaJSPlugin)
 scalaJSUseMainModuleInitializer := true
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+libraryDependencies += "de.sciss" %% "scalamidi" % "0.2.1"
