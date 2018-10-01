@@ -17,9 +17,7 @@ class Board(val boardRows: Int, val boardCols: Int) {
   val boardSize: Int = boardRows * boardCols
 
   def buildBoard(elements: List[MusicalElement]): Unit = {
-    val startTime = elements.head.startTime
-    val endTime = elements.last.startTime + elements.last.duration
-    val totalDuration = endTime - startTime
+    val totalDuration = elements.map(x=>x.duration).sum
 
     def counterToRowCol(counter: Int): (Int, Int) = (counter / boardCols, counter - (counter / boardCols) * boardCols)
 

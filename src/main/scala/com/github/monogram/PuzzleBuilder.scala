@@ -10,9 +10,7 @@ object PuzzleBuilder {
     val minDuration = elements.minBy(x => x.duration).duration
     assert(minDuration>0)
 
-    val startTime = elements.head.startTime
-    val endTime = elements.last.startTime + elements.last.duration
-    val totalDuration = endTime - startTime
+    val totalDuration = elements.map(x => x.duration).sum
 
     println(s"Total duration is $totalDuration and min duration is $minDuration")
 
@@ -36,10 +34,10 @@ object PuzzleBuilder {
   }
 
     def main(args: Array[String]): Unit = {
-      val puzzleName = "chopin_nocturne_9_2"
+      val puzzleName = PuzzleRepository.repo(1)._1
       val puzzleMidi = new File(FileResourceSupplier.getMidiPath(puzzleName))
 
-      val (originalSeq, tracks) = MIDIParser.parse(puzzleMidi)
+      val (_, tracks) = MIDIParser.parse(puzzleMidi)
       val notesList: List[MusicalElement] = MIDIParser.convertTrack(tracks(0))
 
       val (boardRows, boardCols) = calculateBoardSize(notesList)

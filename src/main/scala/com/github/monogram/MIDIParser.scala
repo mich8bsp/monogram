@@ -92,10 +92,14 @@ object MIDIParser {
 
     val totalDuration = convertedRes.last.startTime + convertedRes.last.duration - convertedRes.head.startTime
 
+    val REST_INFLATION_FACTOR = 5
     convertedRes.filter(_ match {
-      case Rest(_, duration) => duration > 0.001 * totalDuration
-      case Note(_, _, duration) => duration > 0//0.0001 * totalDuration
-    })
+      case Rest(_, duration) => duration > 0 //.001 * totalDuration
+      case Note(_, _, duration) => duration > 0 //0.0001 * totalDuration
+    }).map {
+      case Rest(start, duration) => Rest(start, duration * REST_INFLATION_FACTOR)
+      case x: Note => x
+    }
   }
 
 //  def main(args: Array[String]): Unit = {
