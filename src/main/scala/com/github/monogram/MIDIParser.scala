@@ -1,12 +1,14 @@
 package com.github.monogram
 
+import java.io.File
+
 import de.sciss.midi.MetaMessage.EndOfTrack
 import de.sciss.midi._
 
 object MIDIParser {
 
-  def parse(midiPath: String): (Sequence, Map[Int, Track]) = {
-    val sq = Sequence.read(midiPath)
+  def parse(midiFile: File): (Sequence, Map[Int, Track]) = {
+    val sq = Sequence.readFile(midiFile)
 
     def hasMusic(track: Track): Boolean = {
       track.events.exists(e => e.message match {

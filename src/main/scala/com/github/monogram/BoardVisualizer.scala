@@ -7,12 +7,11 @@ import scala.io.Source
 object BoardVisualizer {
 
   def visualize(puzzleName: String): Unit = {
-    val puzzlePath = s"puzzles/$puzzleName.txt"
     var board = new Board(0,0)
     var first = true
     var tableHTML = s"<table width=500px height=500px>"
     var currentRow = -1
-    for( line <- Source.fromFile(puzzlePath).getLines()){
+    for( line <- Source.fromFile(FileResourceSupplier.getPuzzlePath(puzzleName)).getLines()){
       if(first){
         val boardSizeSplit = line.split(",")
         board = new Board(boardSizeSplit(0).toInt, boardSizeSplit(1).toInt)
@@ -39,19 +38,19 @@ object BoardVisualizer {
     tableHTML += s"</table>"
 
     val allHTMLContent = s"""
-                            |<!DOCTYPE html>
-                            |<html lang="en">
-                            |<head>
-                            |    <meta charset="UTF-8">
-                            |    <title>Monogram</title>
-                            |</head>
-                            |<body>
-                            |   $tableHTML
-                            |</body>
-                            |</html>
-  """
+                            <!DOCTYPE html>
+                            <html lang="en">
+                            <head>
+                                <meta charset="UTF-8">
+                                <title>Monogram</title>
+                            </head>
+                            <body>
+                               $tableHTML
+                            </body>
+                            </html>
+  """.trim
 
-    val pw = new PrintWriter(new File(puzzlePath + ".html"))
+    val pw = new PrintWriter(new File(FileResourceSupplier.getPuzzleHTMLPath(puzzleName)))
     pw.write(allHTMLContent)
     pw.close()
 

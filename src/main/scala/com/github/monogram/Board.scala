@@ -10,8 +10,7 @@ case class BoardElement(color: Color, text: String)
 
 class Board(val boardRows: Int, val boardCols: Int) {
   import Board._
-  private var boardConfig = Array.ofDim[BoardElement](boardRows, boardCols)
-
+  var boardConfig: Array[Array[BoardElement]] = Array.ofDim[BoardElement](boardRows, boardCols)
   val boardSize: Int = boardRows * boardCols
 
   def buildBoard(elements: List[MusicalElement]): Unit = {

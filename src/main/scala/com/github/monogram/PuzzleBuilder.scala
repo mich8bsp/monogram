@@ -24,8 +24,8 @@ object PuzzleBuilder {
     (sideSize, sideSize)
   }
 
-  def persistToFile(board: Board, filePath: String): Unit = {
-    val pw = new PrintWriter(new File(filePath))
+  def persistToFile(board: Board, puzzleName: String): Unit = {
+    val pw = new PrintWriter(FileResourceSupplier.getPuzzlePath(puzzleName))
     pw.write(s"${board.boardRows},${board.boardCols}\n")
     for(i <- 0 until board.boardRows){
       for(j <- 0 until board.boardCols){
@@ -37,7 +37,9 @@ object PuzzleBuilder {
 
     def main(args: Array[String]): Unit = {
       val puzzleName = "chopin_nocturne_9_2"
-      val (originalSeq, tracks) = MIDIParser.parse(s"midis/$puzzleName.mid")
+      val puzzleMidi = new File(FileResourceSupplier.getMidiPath(puzzleName))
+
+      val (originalSeq, tracks) = MIDIParser.parse(puzzleMidi)
       val notesList: List[MusicalElement] = MIDIParser.convertTrack(tracks(0))
 
       val (boardRows, boardCols) = calculateBoardSize(notesList)
@@ -53,7 +55,7 @@ object PuzzleBuilder {
         }
       }
 
-      persistToFile(board, s"puzzles/$puzzleName.txt")
+      persistToFile(board, puzzleName)
       BoardVisualizer.visualize(puzzleName)
 
     }
