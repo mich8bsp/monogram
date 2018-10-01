@@ -16,7 +16,7 @@ class GameController extends Controller {
     println(s"got request $request")
     response.ok.fileOrIndex(
       request.params("*"),
-      "index.html")
+      "/client/index.html")
   }
 
   get("/getPuzzle") { request: Request =>
