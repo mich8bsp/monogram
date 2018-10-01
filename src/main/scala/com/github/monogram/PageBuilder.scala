@@ -31,7 +31,7 @@ object PageBuilder {
         first = false
       }else{
         val parsedLine = line.split(",")
-        board.setColor(parsedLine(0).toInt, parsedLine(1).toInt, parsedLine(2))
+        board.fillSquare(parsedLine(0).toInt, parsedLine(1).toInt, parsedLine(2))
       }
     }
     println("building a board")

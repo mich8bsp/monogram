@@ -4,12 +4,17 @@ import com.github.monogram.NoteNotation._
 import org.scalajs.dom.ext.Color
 import scala.math.max
 
+case class BoardElement(color: Color, text: String)
+
 class Board(val boardRows: Int, val boardCols: Int) {
 
   private var boardConfig = Array.ofDim[BoardElement](boardRows, boardCols)
   val boardSize: Int = boardRows * boardCols
 
-  case class BoardElement(color: Color)
+  def musicalElementToText(element: MusicalElement): String = element match {
+    case x: Note => x.noteNotation.toString.replaceFirst("_SH", "#")
+    case _: Rest => " "
+  }
 
   def musicalElementToColor(element: MusicalElement): Color = element match {
     case x: Note => x.noteNotation match {
@@ -44,11 +49,12 @@ class Board(val boardRows: Int, val boardCols: Int) {
         val squaresToFill = durationToNumOfSquares(duration)
         println(s"at counter $currentBoardCounter filling $squaresToFill squares")
         val color = musicalElementToColor(x)
+        val text = musicalElementToText(x)
 
         if (squaresToFill > 0) {
           Range(currentBoardCounter, currentBoardCounter + squaresToFill).foreach(i => {
             val (r, c) = counterToRowCol(i)
-            boardConfig(r)(c) = BoardElement(color)
+            boardConfig(r)(c) = BoardElement(color, text)
           })
         }
         fillBoard(xs, currentBoardCounter + squaresToFill)
@@ -59,7 +65,7 @@ class Board(val boardRows: Int, val boardCols: Int) {
     for (i <- 0 until boardRows) {
       for (j <- 0 until boardCols) {
         if (boardConfig(i)(j) == null) {
-          boardConfig(i)(j) = BoardElement(musicalElementToColor(Rest(0, 0)))
+          boardConfig(i)(j) = BoardElement(musicalElementToColor(Rest(0, 0)), musicalElementToText(Rest(0, 0)))
         }
       }
     }
@@ -69,11 +75,11 @@ class Board(val boardRows: Int, val boardCols: Int) {
 
   def getColor(r: Int, c: Int): Color = boardConfig(r)(c).color
 
-  def setColor(i: Int, j: Int, color: String): Unit = {
-    boardConfig(i)(j) = BoardElement(Color(color))
+  def getText(r: Int, c: Int): String = boardConfig(r)(c).text
+
+  def fillSquare(i: Int, j: Int, color: String, text: String = " "): Unit = {
+    boardConfig(i)(j) = BoardElement(Color(color), text)
   }
-
-
 
 }
 
