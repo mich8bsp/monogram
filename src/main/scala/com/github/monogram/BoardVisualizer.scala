@@ -6,8 +6,8 @@ import scala.io.Source
 
 object BoardVisualizer {
 
-  def main(args: Array[String]): Unit = {
-    val puzzlePath = "puzzles/chopin_nocturne_9_2.txt"
+  def visualize(puzzleName: String): Unit = {
+    val puzzlePath = s"puzzles/$puzzleName.txt"
     var board = new Board(0,0)
     var first = true
     var tableHTML = s"<table width=500px height=500px>"

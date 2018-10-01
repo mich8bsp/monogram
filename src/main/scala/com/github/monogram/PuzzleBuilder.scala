@@ -14,9 +14,13 @@ object PuzzleBuilder {
     val endTime = elements.last.startTime + elements.last.duration
     val totalDuration = endTime - startTime
 
+    println(s"Total duration is $totalDuration and min duration is $minDuration")
+
     val squaresCount: Double = totalDuration.toDouble / minDuration
 
+
     val sideSize = sqrt(squaresCount).ceil.toInt
+    println(s"making board of $sideSize x $sideSize with $squaresCount squares")
     (sideSize, sideSize)
   }
 
@@ -25,21 +29,16 @@ object PuzzleBuilder {
     pw.write(s"${board.boardRows},${board.boardCols}\n")
     for(i <- 0 until board.boardRows){
       for(j <- 0 until board.boardCols){
-        pw.write(s"$i,$j,${board.getColor(i,j).toHex},${board.getText(i,j)}\n")
+        pw.write(s"$i,$j,${board.getColor(i,j)},${board.getText(i,j)}\n")
       }
     }
     pw.close()
   }
 
     def main(args: Array[String]): Unit = {
-  //    val board = document.createElement("p")
-  //    board.textContent = "board placeholder"
-  //    document.body.appendChild(board)
-
       val puzzleName = "chopin_nocturne_9_2"
       val (originalSeq, tracks) = MIDIParser.parse(s"midis/$puzzleName.mid")
       val notesList: List[MusicalElement] = MIDIParser.convertTrack(tracks(0))
-  //    notesList.foreach(println)
 
       val (boardRows, boardCols) = calculateBoardSize(notesList)
 
@@ -54,8 +53,8 @@ object PuzzleBuilder {
         }
       }
 
-
       persistToFile(board, s"puzzles/$puzzleName.txt")
+      BoardVisualizer.visualize(puzzleName)
 
     }
 

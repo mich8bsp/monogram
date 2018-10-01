@@ -13,11 +13,24 @@ object NoteNotation extends Enumeration {
   }
 }
 
-trait MusicalElement{
+sealed trait MusicalElement{
+  def sameNoteAs(other: MusicalElement): Boolean
+
   val startTime: Long
   val duration: Long
 }
 
-case class Rest(startTime: Long, duration: Long) extends MusicalElement
+case class Rest(startTime: Long, duration: Long) extends MusicalElement{
+  override def sameNoteAs(other: MusicalElement): Boolean = other match {
+    case _:Rest => true
+    case _:Note => false
+  }
 
-case class Note(noteNotation: NoteNotation, startTime: Long, duration: Long) extends MusicalElement
+}
+
+case class Note(noteNotation: NoteNotation, startTime: Long, duration: Long) extends MusicalElement{
+  override def sameNoteAs(other: MusicalElement): Boolean = other match {
+    case _:Rest => false
+    case Note(otherNoteNotation, _, _) => otherNoteNotation == noteNotation
+  }
+}

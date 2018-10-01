@@ -31,6 +31,24 @@ object MIDIParser {
     (sq, channels)
   }
 
+  def consolidate(elements: List[MusicalElement]): List[MusicalElement] = {
+
+    def consolidationStep(remainingElements: List[MusicalElement], lastElement: MusicalElement) :List[MusicalElement] = remainingElements match {
+      case Nil => lastElement::Nil
+      case x::xs => if(x.sameNoteAs(lastElement)){
+        val updatedLast = lastElement match {
+          case Rest(start, duration) => Rest(start, duration + x.duration)
+          case Note(notation, start, duration) => Note(notation, start, duration + x.duration)
+        }
+        consolidationStep(xs, updatedLast)
+      }else{
+        lastElement::consolidationStep(xs, x)
+      }
+    }
+
+    consolidationStep(elements.tail, elements.head)
+  }
+
   def convertTrack(track: Track): List[MusicalElement]= {
 
     def updateWithDuration(element: MusicalElement, stopTime: Long): MusicalElement = element match {
@@ -68,11 +86,14 @@ object MIDIParser {
       }
     }
 
-    val convertedRes = convertNotes(track.events.toList, null)
+    val convertedRes = consolidate(convertNotes(track.events.toList, null))
 
     val totalDuration = convertedRes.last.startTime + convertedRes.last.duration - convertedRes.head.startTime
 
-    convertedRes.filter(_.duration > 0.001 * totalDuration)
+    convertedRes.filter(_ match {
+      case Rest(_, duration) => duration > 0.001 * totalDuration
+      case Note(_, _, duration) => duration > 0//0.0001 * totalDuration
+    })
   }
 
 //  def main(args: Array[String]): Unit = {

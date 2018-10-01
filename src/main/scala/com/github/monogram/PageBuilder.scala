@@ -11,7 +11,7 @@ object PageBuilder {
       val row = document.createElement("tr")
       for (j<- 0 until board.boardCols){
         val col = document.createElement("td")
-        col.setAttribute("bgcolor", board.getColor(i, j).toHex)
+        col.setAttribute("bgcolor", board.getColor(i, j))
         row.appendChild(col)
       }
       boardTable.appendChild(row)
