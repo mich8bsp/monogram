@@ -5,6 +5,7 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 
+// run with program argument: -local.doc.root=fileResources
 object ServerMain extends Server
 
 class Server extends HttpServer {

@@ -8,7 +8,12 @@ import scala.collection.mutable
 
 class GameController extends Controller {
 
-  val puzzlesMapping: mutable.Map[String, Board] = mutable.Map()
+  case class Puzzle(id: Int, name: String, solution: Board)
+
+  val puzzlesMapping: mutable.Map[Int, Puzzle] = mutable.Map()
+
+  //put all puzzles here
+  val puzzleIdToName: Map[Int, String] = Map(1 -> "chopin_nocturne_9_2")
 
   case class BoardResponse(board: Array[Array[BoardElement]],
                            rows: Int,
@@ -24,15 +29,16 @@ class GameController extends Controller {
   }
 
   get("/getPuzzle") { request: Request =>
-    val puzzleId = request.params.getOrElse("puzzleId", "chopin_nocturne_9_2")
-    val puzzleBoard = puzzlesMapping.getOrElse(puzzleId, PuzzleReader.readPuzzle(puzzleId))
+    val puzzleId = request.params.getOrElse("puzzleId", "1").toInt
+    val puzzleName = puzzleIdToName(puzzleId)
+    val puzzle = puzzlesMapping.getOrElse(puzzleId, Puzzle(puzzleId, puzzleName, PuzzleReader.readPuzzle(puzzleName)))
     if(!puzzlesMapping.contains(puzzleId)){
-      puzzlesMapping(puzzleId) = puzzleBoard
+      puzzlesMapping(puzzleId) = puzzle
     }
-    val metadata = puzzleBoard.buildBoardMetadata()
-    BoardResponse(board = puzzleBoard.boardConfig,
-      rows = puzzleBoard.boardRows,
-      cols = puzzleBoard.boardCols,
+    val metadata = puzzle.solution.buildBoardMetadata()
+    BoardResponse(board = puzzle.solution.boardConfig,
+      rows = puzzle.solution.boardRows,
+      cols = puzzle.solution.boardCols,
       rowsMetadata = metadata._1,
       colsMetadata = metadata._2)
   }
