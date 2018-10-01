@@ -1,6 +1,6 @@
 package com.github.monogram.gameserver
 
-import com.github.monogram.{Board, BoardElement, PuzzleReader}
+import com.github.monogram.{Board, BoardElement, PuzzleReader, SideMetadataElement}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 
@@ -10,7 +10,11 @@ class GameController extends Controller {
 
   val puzzlesMapping: mutable.Map[String, Board] = mutable.Map()
 
-  case class BoardResponse(board: Array[Array[BoardElement]], rows: Int, cols: Int)
+  case class BoardResponse(board: Array[Array[BoardElement]],
+                           rows: Int,
+                           cols: Int,
+                           rowsMetadata: List[List[SideMetadataElement]],
+                           colsMetadata: List[List[SideMetadataElement]])
 
   get("/:*") { request: Request =>
     println(s"got request $request")
@@ -25,7 +29,12 @@ class GameController extends Controller {
     if(!puzzlesMapping.contains(puzzleId)){
       puzzlesMapping(puzzleId) = puzzleBoard
     }
-    BoardResponse(puzzleBoard.boardConfig, puzzleBoard.boardRows, puzzleBoard.boardCols)
+    val metadata = puzzleBoard.buildBoardMetadata()
+    BoardResponse(board = puzzleBoard.boardConfig,
+      rows = puzzleBoard.boardRows,
+      cols = puzzleBoard.boardCols,
+      rowsMetadata = metadata._1,
+      colsMetadata = metadata._2)
   }
 
 }

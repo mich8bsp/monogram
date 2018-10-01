@@ -5,11 +5,14 @@ import com.github.monogram.NoteNotation._
 
 import scala.math.max
 
+case class SideMetadataElement(color: Color, text: String, count: Int)
 
 case class BoardElement(color: Color, text: String)
 
 class Board(val boardRows: Int, val boardCols: Int) {
+
   import Board._
+
   var boardConfig: Array[Array[BoardElement]] = Array.ofDim[BoardElement](boardRows, boardCols)
   val boardSize: Int = boardRows * boardCols
 
@@ -63,9 +66,35 @@ class Board(val boardRows: Int, val boardCols: Int) {
     boardConfig(i)(j) = BoardElement(color, text)
   }
 
+
+  def buildBoardMetadata(): (List[List[SideMetadataElement]], List[List[SideMetadataElement]]) = {
+
+    def consolidateRow(elements: List[BoardElement], currentMeta: SideMetadataElement): List[SideMetadataElement] = elements match {
+      case BoardElement(color, text) :: xs => if (currentMeta.color == color) {
+        consolidateRow(xs, SideMetadataElement(color, text, currentMeta.count + 1))
+      } else {
+        currentMeta :: consolidateRow(xs, SideMetadataElement(color, text, 1))
+      }
+      case Nil => currentMeta::Nil
+    }
+
+    val rowsMetadata: List[List[SideMetadataElement]] = Range(0, boardRows).map(i => {
+      val currRow: List[BoardElement] = boardConfig(i).toList
+      consolidateRow(currRow.tail, SideMetadataElement(currRow.head.color, currRow.head.text, 1))
+        .filter(x => x.color != musicalElementToColor(Rest(0,0)))
+    }).toList
+
+    val colsMetadata: List[List[SideMetadataElement]] = Range(0, boardCols).map(i => {
+      val currCol: List[BoardElement] = boardConfig.map(row => row(i)).toList
+      consolidateRow(currCol.tail, SideMetadataElement(currCol.head.color, currCol.head.text, 1))
+        .filter(x => x.color != musicalElementToColor(Rest(0,0)))
+    }).toList
+
+    (rowsMetadata, colsMetadata)
+  }
 }
 
-object Board{
+object Board {
   type Color = String
 
   def musicalElementToText(element: MusicalElement): String = element match {

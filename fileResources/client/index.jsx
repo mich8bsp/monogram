@@ -3,7 +3,9 @@
 class Board extends React.Component {
 
     state = {
-        boardConfig: []
+        boardConfig: [],
+        boardRows: 0,
+        boardCols: 0
     };
 
     componentDidMount() {
@@ -15,7 +17,9 @@ class Board extends React.Component {
             // create a new "State" object without mutating
             // the original State object.
             const newState = Object.assign({}, this.state, {
-              boardConfig: response.data.board
+              boardConfig: response.data.board,
+              boardRows: response.data.rows,
+              boardCols: response.data.cols
             });
 
             // store the new state object in the component's state
