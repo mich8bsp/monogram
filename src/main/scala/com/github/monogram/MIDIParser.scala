@@ -35,12 +35,12 @@ object MIDIParser {
 
     def updateWithDuration(element: MusicalElement, stopTime: Long): MusicalElement = element match {
       case Rest(startTime, _) => Rest(startTime, stopTime - startTime)
-      case GameNote(note, startTime, _) => GameNote(note, startTime, stopTime - startTime)
+      case Note(note, startTime, _) => Note(note, startTime, stopTime - startTime)
     }
 
     def isMatchingPitch(element: MusicalElement, pitch: Int): Boolean = element match {
       case Rest(_,_) => false
-      case GameNote(note, _, _) => Note.fromPitch(pitch) == note
+      case Note(note, _, _) => NoteNotation.fromPitch(pitch) == note
     }
 
     def convertNotes(remainingNotes: List[Event], lastNote: MusicalElement): List[MusicalElement] = remainingNotes match {
@@ -49,10 +49,10 @@ object MIDIParser {
         case Event(time, NoteOn(_, pitch, _)) =>
           if(lastNote==null){
             //if first note we should wait for second to calculate duration
-            convertNotes(xs, GameNote(Note.fromPitch(pitch), time, 0))
+            convertNotes(xs, Note(NoteNotation.fromPitch(pitch), time, 0))
           }else{
             //if new note is played we should stop the previous note/rest and update its duration
-            updateWithDuration(lastNote, time)::convertNotes(xs, GameNote(Note.fromPitch(pitch), time, 0))
+            updateWithDuration(lastNote, time)::convertNotes(xs, Note(NoteNotation.fromPitch(pitch), time, 0))
           }
         case Event(time, NoteOff(_, pitch, _)) =>
           if(lastNote!=null && isMatchingPitch(lastNote, pitch)){
@@ -64,23 +64,26 @@ object MIDIParser {
           }
 
         case Event(time, EndOfTrack) => updateWithDuration(lastNote, time)::convertNotes(xs, Rest(time, 0))
+        case _ => convertNotes(xs, lastNote)
       }
     }
 
-    convertNotes(track.events.toList, null)
-      .filter(_.duration>0)
+    val convertedRes = convertNotes(track.events.toList, null)
 
+    val totalDuration = convertedRes.last.startTime + convertedRes.last.duration - convertedRes.head.startTime
+
+    convertedRes.filter(_.duration > 0.001 * totalDuration)
   }
 
-  def main(args: Array[String]): Unit = {
-    val (originalSequence, channels) = parse("midis/chopin_nocturne_9_2.mid")
-
-    val pl = Sequencer.open()
-
-//    channels.values
-//      .map(x => Sequence(scala.collection.immutable.IndexedSeq(x)))
-//      .foreach(pl.play)
-
-    pl.play(originalSequence)
-  }
+//  def main(args: Array[String]): Unit = {
+//    val (originalSequence, channels) = parse("midis/chopin_nocturne_9_2.mid")
+//
+//    val pl = Sequencer.open()
+//
+////    channels.values
+////      .map(x => Sequence(scala.collection.immutable.IndexedSeq(x)))
+////      .foreach(pl.play)
+//
+//    pl.play(originalSequence)
+//  }
 }
